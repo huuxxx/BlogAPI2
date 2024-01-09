@@ -19,7 +19,7 @@ namespace BlogApi2
 
             builder.Services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Catalog API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Blog API", Version = "v1" });
             });
 
             var app = builder.Build();
@@ -34,7 +34,7 @@ namespace BlogApi2
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/ swagger / v1 / swagger.json", "Catalog API V1");
+                c.SwaggerEndpoint("/ swagger / v1 / swagger.json", "Blog API V1");
             });
 
             app.UseStaticFiles();
