@@ -17,7 +17,7 @@ namespace BlogApi2.Data
             var database = client.GetDatabase(configuration.GetValue<string>("DatabaseSettings:DatabaseName"));
 
             Blogs = database.GetCollection<Blog>(configuration.GetValue<string>("DatabaseSettings:CollectionName"));
-            BlogContextSeed.SeedData(Blogs);
+            //BlogContextSeed.SeedData(Blogs);
         }
         public IMongoCollection<Blog> Blogs { get; }
     }

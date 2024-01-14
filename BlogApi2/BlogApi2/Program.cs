@@ -10,12 +10,13 @@ namespace BlogApi2
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddRazorPages();
 
             builder.Services.AddScoped<IBlogContext, BlogContext>();
 
             builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+
+            builder.Services.AddMvcCore().AddApiExplorer();
 
             builder.Services.AddSwaggerGen(c =>
             {
@@ -24,7 +25,6 @@ namespace BlogApi2
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
@@ -34,7 +34,7 @@ namespace BlogApi2
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/ swagger / v1 / swagger.json", "Blog API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blog API V1");
             });
 
             app.UseStaticFiles();
