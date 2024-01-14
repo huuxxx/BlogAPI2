@@ -22,8 +22,8 @@ namespace BlogApi2.Controller
         [ProducesResponseType(typeof(IEnumerable<Blog>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<IEnumerable<Blog>>> GetBlogs()
         {
-            var products = await _repository.GetBlogs();
-            return Ok(products);
+            var blogs = await _repository.GetBlogs();
+            return Ok(blogs);
         }
 
         [HttpGet("{id:length(24)}", Name = "GetBlog")]
@@ -31,15 +31,15 @@ namespace BlogApi2.Controller
         [ProducesResponseType(typeof(Blog), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<Blog>> GetBlogById(Guid id)
         {
-            var product = await _repository.GetBlog(id);
+            var blog = await _repository.GetBlog(id);
 
-            if (product == null)
+            if (blog == null)
             {
                 _logger.LogError($"Blog with id: {id}, not found.");
                 return NotFound();
             }
 
-            return Ok(product);
+            return Ok(blog);
         }
 
         [Route("[action]/{title}", Name = "GetBlogByTitle")]
@@ -59,18 +59,18 @@ namespace BlogApi2.Controller
 
         [HttpPost]
         [ProducesResponseType(typeof(Blog), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<Blog>> CreateBlog([FromBody] Blog product)
+        public async Task<ActionResult<Blog>> CreateBlog([FromBody] Blog blog)
         {
-            await _repository.CreateBlog(product);
+            await _repository.CreateBlog(blog);
 
-            return CreatedAtRoute("GetBlog", new { id = product.Id }, product);
+            return CreatedAtRoute("GetBlog", new { id = blog.Id }, blog);
         }
 
         [HttpPut]
         [ProducesResponseType(typeof(Blog), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> UpdateBlog([FromBody] Blog product)
+        public async Task<IActionResult> UpdateBlog([FromBody] Blog blog)
         {
-            return Ok(await _repository.UpdateBlog(product));
+            return Ok(await _repository.UpdateBlog(blog));
         }
 
         [HttpDelete("{id:length(24)}", Name = "DeleteBlog")]
