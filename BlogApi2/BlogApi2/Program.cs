@@ -37,6 +37,8 @@ namespace BlogApi2
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blog API V1");
             });
 
+            app.MapControllers();
+
             app.UseStaticFiles();
 
             app.UseRouting();

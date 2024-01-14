@@ -29,7 +29,7 @@ namespace BlogApi2.Controller
         [HttpGet("{id:length(24)}", Name = "GetBlog")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(Blog), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<Blog>> GetBlogById(Guid id)
+        public async Task<ActionResult<Blog>> GetBlogById(string id)
         {
             var blog = await _repository.GetBlog(id);
 
@@ -75,7 +75,7 @@ namespace BlogApi2.Controller
 
         [HttpDelete("{id:length(24)}", Name = "DeleteBlog")]
         [ProducesResponseType(typeof(Blog), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> DeleteBlogById(Guid id)
+        public async Task<IActionResult> DeleteBlogById(string id)
         {
             return Ok(await _repository.DeleteBlog(id));
         }

@@ -7,7 +7,7 @@ namespace BlogApi2.Entities
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         [BsonElement("Title")]
         public string Title { get; set; }

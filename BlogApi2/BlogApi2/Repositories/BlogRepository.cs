@@ -18,7 +18,7 @@ namespace BlogApi2.Repositories
             await _blogContext.Blogs.InsertOneAsync(blog);
         }
 
-        public async Task<bool> DeleteBlog(Guid id)
+        public async Task<bool> DeleteBlog(string id)
         {
             FilterDefinition<Blog> filter = Builders<Blog>.Filter.Eq(p => p.Id, id);
 
@@ -30,7 +30,7 @@ namespace BlogApi2.Repositories
                 && deleteResult.DeletedCount > 0;
         }
 
-        public async Task<Blog> GetBlog(Guid id)
+        public async Task<Blog> GetBlog(string id)
         {
             return await _blogContext
                            .Blogs
