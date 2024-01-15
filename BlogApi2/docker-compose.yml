@@ -1,8 +1,8 @@
 version: '3.4'
 
-services:
-  blogapi2:
-    image: mongo
-    build:
-      context: .
-      dockerfile: BlogApi2/Dockerfile
+#services:
+#  blogapi2:
+#    image: mongo
+#    build:
+#      context: .
+#      dockerfile: BlogApi2/Dockerfile
