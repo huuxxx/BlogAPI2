@@ -9,11 +9,17 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
-    networks:
-      - net7-network
+    environment:
+      #MONGO_INITDB_ROOT_USERNAME: xxx
+      #MONGO_INITDB_ROOT_PASSWORD: xxx
+      MONGO_INITDB_DATABASE: blogs
+    command: mongod --port 27017
+    #networks:
+    #  - net7-network
 
-  blog.api:
-    container_name: blog.api
+  blogapi:
+    container_name: blogapi
+    restart: always
     build:
       context: .
       dockerfile: BlogApi2/Dockerfile
@@ -21,12 +27,12 @@ services:
       - blogdb
     ports:
       - "8000:80"
-    networks:
-      - net7-network
+    #networks:
+    #  - net7-network
 
 volumes:
   mongo_data:
 
-networks:
-  net7-network:
-    driver: bridge
+#networks:
+#  net7-network:
+#    driver: bridge

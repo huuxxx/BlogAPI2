@@ -7,9 +7,9 @@ namespace BlogApi2.Data
     {
         public BlogContext(IConfiguration configuration)
         {
-            var client = new MongoClient(configuration.GetValue<string>("DatabaseSettings:ConnectionString"));
-            var database = client.GetDatabase(configuration.GetValue<string>("DatabaseSettings:DatabaseName"));
-            Blogs = database.GetCollection<Blog>(configuration.GetValue<string>("DatabaseSettings:CollectionName"));
+            //var client = new MongoClient(configuration.GetValue<string>("DatabaseSettings:ConnectionString"));
+            //var database = client.GetDatabase(configuration.GetValue<string>("DatabaseSettings:DatabaseName"));
+            //Blogs = database.GetCollection<Blog>(configuration.GetValue<string>("DatabaseSettings:CollectionName"));
         }
         public IMongoCollection<Blog> Blogs { get; }
     }

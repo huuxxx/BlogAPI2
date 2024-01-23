@@ -15,7 +15,16 @@ namespace BlogApi2.Repositories
 
         public async Task CreateBlog(Blog blog)
         {
-            await _blogContext.Blogs.InsertOneAsync(blog);
+            try
+            {
+                await _blogContext.Blogs.InsertOneAsync(blog);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
+            
         }
 
         public async Task<bool> DeleteBlog(string id)

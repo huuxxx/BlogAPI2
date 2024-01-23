@@ -1,6 +1,10 @@
 using BlogApi2.Data;
+using BlogApi2.Models;
 using BlogApi2.Repositories;
+using BlogApi2.Services;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
+using MongoDB.Driver.Core.Configuration;
 
 namespace BlogApi2
 {
@@ -12,9 +16,20 @@ namespace BlogApi2
 
             builder.Services.AddRazorPages();
 
-            builder.Services.AddScoped<IBlogContext, BlogContext>();
+            //builder.Services.AddScoped<IBlogContext, BlogContext>();
 
-            builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+            //var client = new MongoClient(builder.Configuration.GetValue<string>("DatabaseSettings:ConnectionString"));
+            //var database = client.GetDatabase(builder.Configuration.GetValue<string>("DatabaseSettings:DatabaseName"));
+
+            //builder.Services.AddSingleton<IMongoClient>(new MongoClient(builder.Configuration.GetValue<string>("DatabaseSettings:ConnectionString")));
+
+            //builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+
+            //builder.Services.Configure<BookStoreDatabaseSettings>(builder.Configuration.GetSection("BookStoreDatabase"));
+
+            builder.Services.Configure<BlogDatabaseSettings>(builder.Configuration.GetSection("DatabaseSettings"));
+
+            builder.Services.AddSingleton<BlogService>();
 
             builder.Services.AddMvcCore().AddApiExplorer();
 

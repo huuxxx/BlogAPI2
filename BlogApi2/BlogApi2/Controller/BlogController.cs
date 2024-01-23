@@ -1,7 +1,6 @@
 ﻿using BlogApi2.Entities;
-using BlogApi2.Repositories;
+using BlogApi2.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace BlogApi2.Controller
 {
@@ -9,75 +8,66 @@ namespace BlogApi2.Controller
     [Route("api/v1/[controller]")]
     public class BlogController : ControllerBase
     {
-        private readonly IBlogRepository _repository;
-        private readonly ILogger<BlogController> _logger;
+        private readonly BlogService _blogsService;
 
-        public BlogController(IBlogRepository repository, ILogger<BlogController> logger)
-        {
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+        public BlogController(BlogService blogsService) =>
+            _blogsService = blogsService;
 
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<Blog>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<IEnumerable<Blog>>> GetBlogs()
-        {
-            var blogs = await _repository.GetBlogs();
-            return Ok(blogs);
-        }
+        public async Task<List<Blog>> Get() =>
+            await _blogsService.GetAsync();
 
-        [HttpGet("{id:length(24)}", Name = "GetBlog")]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(Blog), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<Blog>> GetBlogById(string id)
+        [HttpGet("{id:length(24)}")]
+        public async Task<ActionResult<Blog>> Get(string id)
         {
-            var blog = await _repository.GetBlog(id);
+            var blog = await _blogsService.GetAsync(id);
 
-            if (blog == null)
+            if (blog is null)
             {
-                _logger.LogError($"Blog with id: {id}, not found.");
                 return NotFound();
             }
 
-            return Ok(blog);
-        }
-
-        [Route("[action]/{title}", Name = "GetBlogByTitle")]
-        [HttpGet]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(IEnumerable<Blog>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<IEnumerable<Blog>>> GetBlogByName(string name)
-        {
-            var items = await _repository.GetBlogByTitle(name);
-            if (items == null)
-            {
-                _logger.LogError($"Blogs with name: {name} not found.");
-                return NotFound();
-            }
-            return Ok(items);
+            return blog;
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(Blog), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<Blog>> CreateBlog([FromBody] Blog blog)
+        public async Task<IActionResult> Post(Blog newBlog)
         {
-            await _repository.CreateBlog(blog);
+            await _blogsService.CreateAsync(newBlog);
 
-            return CreatedAtRoute("GetBlog", new { id = blog.Id }, blog);
+            return CreatedAtAction(nameof(Get), new { id = newBlog.Id }, newBlog);
         }
 
-        [HttpPut]
-        [ProducesResponseType(typeof(Blog), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> UpdateBlog([FromBody] Blog blog)
+        [HttpPut("{id:length(24)}")]
+        public async Task<IActionResult> Update(string id, Blog updatedBlog)
         {
-            return Ok(await _repository.UpdateBlog(blog));
+            var blog = await _blogsService.GetAsync(id);
+
+            if (blog is null)
+            {
+                return NotFound();
+            }
+
+            updatedBlog.Id = blog.Id;
+
+            await _blogsService.UpdateAsync(id, updatedBlog);
+
+            return NoContent();
         }
 
-        [HttpDelete("{id:length(24)}", Name = "DeleteBlog")]
-        [ProducesResponseType(typeof(Blog), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> DeleteBlogById(string id)
+        [HttpDelete("{id:length(24)}")]
+        public async Task<IActionResult> Delete(string id)
         {
-            return Ok(await _repository.DeleteBlog(id));
+            var blog = await _blogsService.GetAsync(id);
+
+            if (blog is null)
+            {
+                return NotFound();
+            }
+
+            await _blogsService.RemoveAsync(id);
+
+            return NoContent();
         }
     }
 }
