@@ -7,15 +7,15 @@ services:
     restart: always
     ports:
       - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
+    #volumes:
+    #  - mongo_data:/data/db
     environment:
       #MONGO_INITDB_ROOT_USERNAME: xxx
       #MONGO_INITDB_ROOT_PASSWORD: xxx
       MONGO_INITDB_DATABASE: blogs
-    command: mongod --port 27017
-    #networks:
-    #  - net7-network
+      ASPNETCORE_URLS: http://+:27017
+    networks:
+      - net-network
 
   blogapi:
     container_name: blogapi
@@ -27,12 +27,15 @@ services:
       - blogdb
     ports:
       - "8000:80"
-    #networks:
-    #  - net7-network
+    networks:
+      - net-network
 
-volumes:
-  mongo_data:
 
-#networks:
-#  net7-network:
-#    driver: bridge
+name: blogcontainer
+  
+#volumes:
+#  mongo_data:
+
+networks:
+  net-network:
+    driver: bridge
