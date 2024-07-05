@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BlogAPI2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240703125407_initial")]
+    [Migration("20240705132929_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -27,11 +27,9 @@ namespace BlogAPI2.Migrations
 
             modelBuilder.Entity("BlogAPI2.Entities.Blog", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Content")
                         .IsRequired()

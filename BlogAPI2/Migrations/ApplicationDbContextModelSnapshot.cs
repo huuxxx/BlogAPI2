@@ -24,11 +24,9 @@ namespace BlogAPI2.Migrations
 
             modelBuilder.Entity("BlogAPI2.Entities.Blog", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Content")
                         .IsRequired()

@@ -13,6 +13,7 @@ namespace BlogAPI2.Endpoints
             {
                 var blog = new Blog
                 {
+                    Id = new Guid(),
                     Title = request.Title,
                     Content = request.Content,
                     DateCreated = DateTime.UtcNow,
@@ -36,14 +37,14 @@ namespace BlogAPI2.Endpoints
                 return Results.Ok(products);
             });
 
-            app.MapGet("blogs/{id}", async (int id, ApplicationDbContext context, CancellationToken ct) =>
+            app.MapGet("blogs/{id}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
             {
                 var blog = await context.Blogs.FirstOrDefaultAsync(p => p.Id == id, ct);
 
                 return blog is null ? Results.NotFound() : Results.Ok(blog);
             });
 
-            app.MapPut("blogs/{id}", async (int id, UpdateBlogRequest request, ApplicationDbContext context, CancellationToken ct) =>
+            app.MapPut("blogs/{id}", async (Guid id, UpdateBlogRequest request, ApplicationDbContext context, CancellationToken ct) =>
             {
                 var blog = await context.Blogs
                     .FirstOrDefaultAsync(p => p.Id == id, ct);
@@ -62,7 +63,7 @@ namespace BlogAPI2.Endpoints
                 return Results.NoContent();
             });
 
-            app.MapDelete("blogs/{id}", async (int id, ApplicationDbContext context, CancellationToken ct) =>
+            app.MapDelete("blogs/{id}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
             {
                 var blog = await context.Blogs
                     .FirstOrDefaultAsync(p => p.Id == id, ct);
