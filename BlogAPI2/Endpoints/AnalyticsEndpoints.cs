@@ -1,8 +1,10 @@
 ﻿using BlogAPI2.Contracts;
 using BlogAPI2.Database;
+using BlogAPI2.DTO;
 using BlogAPI2.Entities;
 using BlogAPI2.Helpers;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace BlogAPI2.Endpoints
 {
@@ -53,7 +55,7 @@ namespace BlogAPI2.Endpoints
                     context.Entry(updatedVisitor).Property(x => x.ViewedAbout).IsModified = true;
                 }
 
-                return await context.SaveChangesAsync();
+                return await context.SaveChangesAsync(ct);
             });
 
             app.MapGet("visitorsCount", (ApplicationDbContext context) =>
@@ -73,6 +75,35 @@ namespace BlogAPI2.Endpoints
                     .ToListAsync(ct);
 
                 return Results.Ok(visitors);
+            });
+
+            app.MapGet("visitorsPastWeek", (ApplicationDbContext context) =>
+            {
+                var oneWeekAgo = DateTime.UtcNow.AddDays(-6).Date;
+
+                var query = context.Visitors
+                    .Where(v => v.DateVisited >= oneWeekAgo)
+                    .GroupBy(v => v.DateVisited.Date)
+                    .Select(g => new
+                    {
+                        Date = g.Key,
+                        Count = g.Count()
+                    })
+                    .ToList();
+
+                var result = Enumerable.Range(0, 7)
+                    .Select(i => oneWeekAgo.AddDays(i))
+                    .GroupJoin(query,
+                               date => date,
+                               item => item.Date,
+                               (date, items) => new VisitorsPastWeekDto
+                               {
+                                   VisitsInDay = items.FirstOrDefault()?.Count ?? 0,
+                                   NameOfDay = date.ToString("dddd", CultureInfo.InvariantCulture)
+                               })
+                    .ToList();
+
+                return result;
             });
         }
     }
