@@ -11,4 +11,5 @@ public sealed class ApplicationDbContext : DbContext
     }
 
     public DbSet<Blog> Blogs { get; set; }
+    public DbSet<Visitor> Visitors { get; set; }
 }

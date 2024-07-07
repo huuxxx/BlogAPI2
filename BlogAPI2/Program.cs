@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ConfigurationHelper>();
+builder.Services.AddSingleton<RequestHelper>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
@@ -33,7 +34,8 @@ var option = new RewriteOptions();
 option.AddRedirect("^$", "swagger");
 app.UseRewriter(option); // redirect index to swagger
 
-app.MapProductEndpoints();
+app.MapBlogEndpoints();
 app.MapImageEndpoints();
+app.MapAnalyticsEndpoints();
 
 app.Run();

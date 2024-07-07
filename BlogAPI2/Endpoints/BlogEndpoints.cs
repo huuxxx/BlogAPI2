@@ -2,14 +2,12 @@
 using BlogAPI2.Contracts;
 using BlogAPI2.Database;
 using BlogAPI2.Entities;
-using Microsoft.AspNetCore.Mvc;
-using BlogAPI2.Helpers;
 
 namespace BlogAPI2.Endpoints
 {
     public static class BlogEndpoints
     {
-        public static void MapProductEndpoints(this IEndpointRouteBuilder app)
+        public static void MapBlogEndpoints(this IEndpointRouteBuilder app)
         {
             app.MapPost("blogs", async (CreateBlogRequest request, ApplicationDbContext context, CancellationToken ct) =>
             {
@@ -30,13 +28,14 @@ namespace BlogAPI2.Endpoints
 
             app.MapGet("blogs", async (ApplicationDbContext context, CancellationToken ct, int page = 1, int pageSize = 10) =>
             {
-                var products = await context.Blogs
+                var blogs = await context.Blogs
                     .AsNoTracking()
+                    .OrderByDescending(x => x.DateCreated)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync(ct);
 
-                return Results.Ok(products);
+                return Results.Ok(blogs);
             });
 
             app.MapGet("blogs/{id}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
