@@ -2,6 +2,8 @@
 using BlogAPI2.Contracts;
 using BlogAPI2.Database;
 using BlogAPI2.Entities;
+using Microsoft.AspNetCore.Mvc;
+using BlogAPI2.Helpers;
 
 namespace BlogAPI2.Endpoints
 {
@@ -78,6 +80,42 @@ namespace BlogAPI2.Endpoints
                 await context.SaveChangesAsync(ct);
 
                 return Results.NoContent();
+            });
+
+            app.MapPost("images", async ([FromForm] IFormFile file, CancellationToken ct) =>
+            {
+                string timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssffff");
+                string path = Path.Combine(Directory.GetCurrentDirectory(), @$"{ConfigurationHelper.GetImagesDirectory}\" + timeStamp + Path.GetExtension(file.FileName));
+                
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream, ct);
+                }
+
+                return $"{ConfigurationHelper.GetApiUrl}/{ConfigurationHelper.GetImagesDirectory}/{timeStamp + Path.GetExtension(file.FileName)}";
+            });
+
+            app.MapDelete("images/{id}", (string id) =>
+            {
+                string path = Path.Combine(Directory.GetCurrentDirectory(), $@"{ConfigurationHelper.GetImagesDirectory}\" + id);
+                File.Delete(path);
+                return Results.NoContent();
+            });
+
+            app.MapGet("images", () =>
+            {
+                string path = Path.Combine(Directory.GetCurrentDirectory(), $"{ConfigurationHelper.GetImagesDirectory}");
+                string[] images = Directory.GetFiles(path);
+
+                if (images.Length > 0)
+                {
+                    for (int i = 0; i < images.Length; i++)
+                    {
+                        images[i] = Path.GetFileName(images[i]);
+                    }
+                }
+
+                return Results.Ok(images);
             });
         }
     }
