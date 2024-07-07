@@ -34,5 +34,6 @@ option.AddRedirect("^$", "swagger");
 app.UseRewriter(option); // redirect index to swagger
 
 app.MapProductEndpoints();
+app.MapImageEndpoints();
 
 app.Run();
