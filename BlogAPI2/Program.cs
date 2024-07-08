@@ -4,6 +4,8 @@ using BlogAPI2.Extensions;
 using BlogAPI2.Endpoints;
 using Microsoft.AspNetCore.Rewrite;
 using BlogAPI2.Helpers;
+using BlogAPI2.Entities;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ConfigurationHelper>();
 builder.Services.AddSingleton<RequestHelper>();
+builder.Services.AddSingleton<UserManager<User>>();
+
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication();
+builder.Services.AddIdentityCore<User>().AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));

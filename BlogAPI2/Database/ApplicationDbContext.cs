@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BlogAPI2.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BlogAPI2.Database;
 
-public sealed class ApplicationDbContext : DbContext
+public sealed class ApplicationDbContext : IdentityDbContext<User>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
