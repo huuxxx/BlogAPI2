@@ -1,7 +1,10 @@
-﻿namespace BlogAPI2.Contracts
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BlogAPI2.Contracts
 {
     public class UpdateVisitorRequest
     {
+        [Required]
         public Guid Id { get; set; }
 
         public bool ViewedBlogs { get; set; }

@@ -13,7 +13,7 @@ namespace BlogAPI2.Endpoints
     {
         public static void MapAuthenticantionEndpoints(this IEndpointRouteBuilder app)
         {
-            app.MapPost("login", async (LoginRequest request, UserManager<User> userManager, CancellationToken ct) =>
+            app.MapPost("login", async (LoginRequest request, UserManager<User> userManager) =>
             {
                 var user = await userManager.FindByNameAsync(request.UserName);
 
@@ -50,6 +50,28 @@ namespace BlogAPI2.Endpoints
                 }
 
                 return Results.Unauthorized();
+            });
+
+            app.MapPost("register", async (RegisterRequest request, UserManager<User> userManager) =>
+            {
+                var userExists = await userManager.FindByNameAsync(request.Username);
+
+                if (userExists != null)
+                    return Results.BadRequest("User already exists");
+
+                User user = new User()
+                {
+                    Email = request.Email,
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    UserName = request.Username
+                };
+
+                var result = await userManager.CreateAsync(user, request.Password);
+                
+                if (!result.Succeeded)
+                    return Results.BadRequest("Failed to create user");
+
+                return Results.Ok();
             });
         }
     }
