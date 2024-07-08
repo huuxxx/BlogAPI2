@@ -13,7 +13,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ConfigurationHelper>();
 builder.Services.AddSingleton<RequestHelper>();
-builder.Services.AddSingleton<UserManager<User>>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
@@ -21,6 +20,17 @@ builder.Services.AddIdentityCore<User>().AddEntityFrameworkStores<ApplicationDbC
 
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
+
+builder.Services.AddIdentityCore<User>(options =>
+{
+    // Configure Identity options here if needed
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+builder.Services.AddScoped<UserManager<User>>();
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication();
 
 builder.WebHost.UseKestrel(options =>
 {
@@ -44,5 +54,6 @@ app.UseRewriter(option); // redirect index to swagger
 app.MapBlogEndpoints();
 app.MapImageEndpoints();
 app.MapAnalyticsEndpoints();
+app.MapAuthenticantionEndpoints();
 
 app.Run();
