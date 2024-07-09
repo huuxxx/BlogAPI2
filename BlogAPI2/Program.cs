@@ -17,21 +17,16 @@ builder.Services.AddSingleton<RequestHelper>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
-builder.Services.AddIdentityCore<User>().AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
 
-builder.Services.AddIdentityCore<User>(options =>
-{
-    // Configure Identity options here if needed
-})
-.AddEntityFrameworkStores<ApplicationDbContext>()
-.AddDefaultTokenProviders();
+builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<UserManager<User>>();
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication();
+builder.Services.AddScoped<RoleManager<IdentityRole>>();
 
 builder.WebHost.UseKestrel(options =>
 {
@@ -52,6 +47,9 @@ app.UseSwaggerUI();
 var option = new RewriteOptions();
 option.AddRedirect("^$", "swagger");
 app.UseRewriter(option); // redirect index to swagger
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapBlogEndpoints();
 app.MapImageEndpoints();

@@ -12,9 +12,9 @@ namespace BlogAPI2.Endpoints
     {
         public static void MapAnalyticsEndpoints(this IEndpointRouteBuilder app)
         {
-            app.MapPost("visitors", async (Visitor request, ApplicationDbContext context, CancellationToken ct) =>
+            app.MapPost("visitors", async (Visitor request, ApplicationDbContext context, CancellationToken ct, RequestHelper requestHelper) =>
             {
-                var ipAddress = RequestHelper.GetIpAddress();
+                var ipAddress = requestHelper.GetIpAddress();
 
                 var visitor = new Visitor
                 {
@@ -34,28 +34,36 @@ namespace BlogAPI2.Endpoints
 
             app.MapPut("visitors", async (UpdateVisitorRequest request, ApplicationDbContext context, CancellationToken ct) =>
             {
-                var updatedVisitor = new Visitor { Id = request.Id };
-                context.Visitors.Attach(updatedVisitor);
+                var visitor = await context.Visitors.FirstOrDefaultAsync(x => x.Id == request.Id, ct);
+
+                if (visitor is null)
+                {
+                    return Results.NotFound();
+                }
+
+                context.Visitors.Attach(visitor);
 
                 if (request.ViewedBlogs)
                 {
-                    updatedVisitor.ViewedBlogs = true;
-                    context.Entry(updatedVisitor).Property(x => x.ViewedBlogs).IsModified = true;
+                    visitor.ViewedBlogs = true;
+                    context.Entry(visitor).Property(x => x.ViewedBlogs).IsModified = true;
                 }
 
                 if (request.ViewedProjects)
                 {
-                    updatedVisitor.ViewedProjects = true;
-                    context.Entry(updatedVisitor).Property(x => x.ViewedProjects).IsModified = true;
+                    visitor.ViewedProjects = true;
+                    context.Entry(visitor).Property(x => x.ViewedProjects).IsModified = true;
                 }
 
                 if (request.ViewedAbout)
                 {
-                    updatedVisitor.ViewedAbout = true;
-                    context.Entry(updatedVisitor).Property(x => x.ViewedAbout).IsModified = true;
+                    visitor.ViewedAbout = true;
+                    context.Entry(visitor).Property(x => x.ViewedAbout).IsModified = true;
                 }
 
-                return await context.SaveChangesAsync(ct);
+                await context.SaveChangesAsync(ct);
+
+                return Results.Ok();
             });
 
             app.MapGet("visitorsCount", (ApplicationDbContext context) =>
@@ -103,7 +111,7 @@ namespace BlogAPI2.Endpoints
                                })
                     .ToList();
 
-                return result;
+                return Results.Ok(result);
             });
         }
     }

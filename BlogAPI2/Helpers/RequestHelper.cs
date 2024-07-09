@@ -1,14 +1,16 @@
-﻿namespace BlogAPI2.Helpers
+﻿using Microsoft.Extensions.Configuration;
+
+namespace BlogAPI2.Helpers
 {
     public class RequestHelper
     {
-        private static IHttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public static void Configure(IHttpContextAccessor httpContextAccessor)
+        public RequestHelper(IHttpContextAccessor httpContextAccessor)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor)); ;
         }
-        public static string GetIpAddress()
+        public string GetIpAddress()
         {
             var context = _httpContextAccessor.HttpContext;
             return context?.Connection.RemoteIpAddress?.ToString();

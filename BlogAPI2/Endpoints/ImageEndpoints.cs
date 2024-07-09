@@ -7,29 +7,29 @@ namespace BlogAPI2.Endpoints
     {
         public static void MapImageEndpoints(this IEndpointRouteBuilder app)
         {
-            app.MapPost("images", async ([FromForm] IFormFile file, CancellationToken ct) =>
+            app.MapPost("images", async ([FromForm] IFormFile file, CancellationToken ct, ConfigurationHelper configurationHelper) =>
             {
                 string timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssffff");
-                string path = Path.Combine(Directory.GetCurrentDirectory(), @$"{ConfigurationHelper.GetImagesDirectory}\" + timeStamp + Path.GetExtension(file.FileName));
+                string path = Path.Combine(Directory.GetCurrentDirectory(), @$"{configurationHelper.GetImagesDirectory}\" + timeStamp + Path.GetExtension(file.FileName));
 
                 using (var stream = new FileStream(path, FileMode.Create))
                 {
                     await file.CopyToAsync(stream, ct);
                 }
 
-                return $"{ConfigurationHelper.GetApiUrl}/{ConfigurationHelper.GetImagesDirectory}/{timeStamp + Path.GetExtension(file.FileName)}";
-            });
+                return $"{configurationHelper.GetApiUrl}/{configurationHelper.GetImagesDirectory}/{timeStamp + Path.GetExtension(file.FileName)}";
+            }).DisableAntiforgery();
 
-            app.MapDelete("images/{id}", (string id) =>
+            app.MapDelete("images/{id}", (string id, ConfigurationHelper configurationHelper) =>
             {
-                string path = Path.Combine(Directory.GetCurrentDirectory(), $@"{ConfigurationHelper.GetImagesDirectory}\" + id);
+                string path = Path.Combine(Directory.GetCurrentDirectory(), $@"{configurationHelper.GetImagesDirectory}\" + id);
                 File.Delete(path);
                 return Results.NoContent();
             });
 
-            app.MapGet("images", () =>
+            app.MapGet("images", (ConfigurationHelper configurationHelper) =>
             {
-                string path = Path.Combine(Directory.GetCurrentDirectory(), $"{ConfigurationHelper.GetImagesDirectory}");
+                string path = Path.Combine(Directory.GetCurrentDirectory(), $"{configurationHelper.GetImagesDirectory}");
                 string[] images = Directory.GetFiles(path);
 
                 if (images.Length > 0)

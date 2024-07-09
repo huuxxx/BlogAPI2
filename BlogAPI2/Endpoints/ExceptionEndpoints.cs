@@ -18,17 +18,18 @@ namespace BlogAPI2.Endpoints
             {
                 var exceptions = await context.ExceptionInfo.ToListAsync(ct);
 
-                if (exceptions is null)
+                if (exceptions.Count == 0)
                 {
                     return Results.NotFound();
                 }
 
-                context.Remove(exceptions);
+                context.RemoveRange(exceptions);
 
                 await context.SaveChangesAsync(ct);
 
                 return Results.NoContent();
             });
+
         }
     }
 }

@@ -13,7 +13,7 @@ namespace BlogAPI2.Endpoints
     {
         public static void MapAuthenticantionEndpoints(this IEndpointRouteBuilder app)
         {
-            app.MapPost("login", async (LoginRequest request, UserManager<User> userManager) =>
+            app.MapPost("login", async (LoginRequest request, UserManager<User> userManager, ConfigurationHelper configurationHelper) =>
             {
                 var user = await userManager.FindByNameAsync(request.UserName);
 
@@ -32,11 +32,11 @@ namespace BlogAPI2.Endpoints
                         authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                     }
 
-                    var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConfigurationHelper.GetJwtSecret()));
+                    var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configurationHelper.GetJwtSecret()));
 
                     var token = new JwtSecurityToken(
-                        issuer: ConfigurationHelper.GetJwtIssuer(),
-                        audience: ConfigurationHelper.GetJwtAudience(),
+                        issuer: configurationHelper.GetJwtIssuer(),
+                        audience: configurationHelper.GetJwtAudience(),
                         expires: DateTime.Now.AddHours(3),
                         claims: authClaims,
                         signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)

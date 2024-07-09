@@ -2,34 +2,34 @@
 {
     public class ConfigurationHelper
     {
-        private static IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
         public ConfigurationHelper(IConfiguration configuration)
         {
-            _configuration = configuration;
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        public static string GetApiUrl()
+        public string GetApiUrl()
         {
             return _configuration["MySettings:ApiUrl"];
         }
 
-        public static string GetImagesDirectory()
+        public string GetImagesDirectory()
         {
             return _configuration["MySettings:ImagesDirectory"];
         }
 
-        public static string GetJwtSecret()
+        public string GetJwtSecret()
         {
             return _configuration["JWT:Secret"];
         }
 
-        public static string GetJwtAudience()
+        public string GetJwtAudience()
         {
             return _configuration["JWT:ValidAudience"];
         }
 
-        public static string GetJwtIssuer()
+        public string GetJwtIssuer()
         {
             return _configuration["JWT:ValidIssuer"];
         }

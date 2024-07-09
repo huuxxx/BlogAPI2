@@ -40,7 +40,7 @@ namespace BlogAPI2.Endpoints
 
             app.MapGet("blogs/{id}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
             {
-                var blog = await context.Blogs.FirstOrDefaultAsync(p => p.Id == id, ct);
+                var blog = await context.Blogs.FirstOrDefaultAsync(x => x.Id == id, ct);
 
                 if (blog != null)
                 {
@@ -60,10 +60,9 @@ namespace BlogAPI2.Endpoints
                 return blogs is null ? Results.NotFound() : Results.Ok(blogs);
             });
 
-            app.MapPut("blogs/{id}", async (Guid id, UpdateBlogRequest request, ApplicationDbContext context, CancellationToken ct) =>
+            app.MapPut("blogs", async (UpdateBlogRequest request, ApplicationDbContext context, CancellationToken ct) =>
             {
-                var blog = await context.Blogs
-                    .FirstOrDefaultAsync(p => p.Id == id, ct);
+                var blog = await context.Blogs.FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
                 if (blog is null)
                 {
@@ -76,13 +75,12 @@ namespace BlogAPI2.Endpoints
 
                 await context.SaveChangesAsync(ct);
 
-                return Results.NoContent();
+                return Results.Ok();
             });
 
             app.MapDelete("blogs/{id}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
             {
-                var blog = await context.Blogs
-                    .FirstOrDefaultAsync(p => p.Id == id, ct);
+                var blog = await context.Blogs.FirstOrDefaultAsync(x => x.Id == id, ct);
 
                 if (blog is null)
                 {

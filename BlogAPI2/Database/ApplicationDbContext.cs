@@ -11,6 +11,11 @@ public sealed class ApplicationDbContext : IdentityDbContext<User>
     {
     }
 
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+    }
+
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Visitor> Visitors { get; set; }
     public DbSet<ExceptionInfo> ExceptionInfo { get; set; }
