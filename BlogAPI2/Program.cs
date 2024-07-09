@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Rewrite;
 using BlogAPI2.Helpers;
 using BlogAPI2.Entities;
 using Microsoft.AspNetCore.Identity;
+using BlogAPI2.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,10 +39,11 @@ builder.WebHost.UseKestrel(options =>
 });
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
-    //app.ApplyMigrations();
+    app.ApplyMigrations();
 }
 
 app.UseSwagger();
