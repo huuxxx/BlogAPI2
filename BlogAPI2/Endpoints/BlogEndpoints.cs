@@ -30,7 +30,7 @@ namespace BlogAPI2.Endpoints
             {
                 var blogs = await context.Blogs
                     .AsNoTracking()
-                    .OrderByDescending(x => x.DateCreated)
+                    .OrderBy(x => x.DateCreated)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync(ct);
@@ -42,7 +42,22 @@ namespace BlogAPI2.Endpoints
             {
                 var blog = await context.Blogs.FirstOrDefaultAsync(p => p.Id == id, ct);
 
-                return blog is null ? Results.NotFound() : Results.Ok(blog);
+                if (blog != null)
+                {
+                    var increment = blog.ViewCount + 1;
+                    blog.ViewCount = increment;
+                    await context.SaveChangesAsync(ct);
+                    return Results.Ok(blog);
+                }
+
+                return Results.NotFound();
+            });
+
+            app.MapGet("blogIds", async (ApplicationDbContext context, CancellationToken ct) =>
+            {
+                var blogs = await context.Blogs.OrderBy(x => x.DateCreated).Select(x => x.Id).ToListAsync(ct);
+
+                return blogs is null ? Results.NotFound() : Results.Ok(blogs);
             });
 
             app.MapPut("blogs/{id}", async (Guid id, UpdateBlogRequest request, ApplicationDbContext context, CancellationToken ct) =>
