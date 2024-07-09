@@ -8,13 +8,13 @@ namespace BlogAPI2.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionHandlerMiddleware> _logger;
-        private readonly ApplicationDbContext _context;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionHandlerMiddleware> logger, ApplicationDbContext context)
+        public ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionHandlerMiddleware> logger, IServiceScopeFactory serviceScopeFactory)
         {
             _next = next;
             _logger = logger;
-            _context = context;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -26,17 +26,7 @@ namespace BlogAPI2.Middleware
             catch (Exception exception)
             {
                 _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
-
-                var exceptionInfo = new ExceptionInfo
-                {
-                    Id = new Guid(),
-                    DateCreated = DateTime.UtcNow,
-                    StackTrace = exception.StackTrace,
-                    Message = exception.Message
-                };
-
-                _context.Add(exceptionInfo);
-                _context.SaveChanges();
+                await LogExceptionToDatabaseAsync(exception);
 
                 var problemDetails = new ProblemDetails
                 {
@@ -46,6 +36,24 @@ namespace BlogAPI2.Middleware
 
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 await context.Response.WriteAsJsonAsync(problemDetails);
+            }
+        }
+
+        private async Task LogExceptionToDatabaseAsync(Exception exception)
+        {
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var exceptionInfo = new ExceptionInfo
+                {
+                    Id = new Guid(),
+                    DateCreated = DateTime.UtcNow,
+                    StackTrace = exception.StackTrace,
+                    Message = exception.Message
+                };
+
+                context.Add(exceptionInfo);
+                await context.SaveChangesAsync();
             }
         }
     }

@@ -57,5 +57,6 @@ app.MapBlogEndpoints();
 app.MapImageEndpoints();
 app.MapAnalyticsEndpoints();
 app.MapAuthenticantionEndpoints();
+app.MapExceptionEndpoints();
 
 app.Run();
