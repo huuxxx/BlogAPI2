@@ -24,7 +24,7 @@ namespace BlogAPI2.Endpoints
                 await context.SaveChangesAsync(ct);
 
                 return Results.Ok(blog);
-            });
+            }).RequireAuthorization();
 
             app.MapGet("blogs", async (ApplicationDbContext context, CancellationToken ct, int page = 1, int pageSize = 10) =>
             {
@@ -76,7 +76,7 @@ namespace BlogAPI2.Endpoints
                 await context.SaveChangesAsync(ct);
 
                 return Results.Ok();
-            });
+            }).RequireAuthorization();
 
             app.MapDelete("blogs/{id}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
             {
@@ -92,7 +92,7 @@ namespace BlogAPI2.Endpoints
                 await context.SaveChangesAsync(ct);
 
                 return Results.NoContent();
-            });
+            }).RequireAuthorization();
         }
     }
 }

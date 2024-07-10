@@ -12,7 +12,7 @@ namespace BlogAPI2.Endpoints
                 var exceptions = await context.ExceptionInfo.OrderBy(x => x.DateCreated).ToListAsync(ct);
 
                 return Results.Ok(exceptions);
-            });
+            }).RequireAuthorization();
 
             app.MapDelete("exceptions", async (ApplicationDbContext context, CancellationToken ct) =>
             {
@@ -28,7 +28,7 @@ namespace BlogAPI2.Endpoints
                 await context.SaveChangesAsync(ct);
 
                 return Results.NoContent();
-            });
+            }).RequireAuthorization();
 
         }
     }
