@@ -18,6 +18,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ConfigurationHelper>();
 builder.Services.AddSingleton<RequestHelper>();
+builder.Services.AddCors();
 
 builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -56,7 +57,7 @@ builder.Services.AddSwaggerGen(swagger =>
     swagger.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "JWT Token Authentication API",
+        Title = "Blog API",
         Description = ".NET 8 Web API"
     });
 
@@ -85,9 +86,6 @@ builder.Services.AddSwaggerGen(swagger =>
     });
 });
 
-builder.WebHost.UseKestrel(options =>
-    options.ListenAnyIP(5000));
-
 var app = builder.Build();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 
@@ -101,7 +99,9 @@ if (app.Environment.IsDevelopment())
     option.AddRedirect("^$", "swagger");
     app.UseRewriter(option);
 }
+else builder.WebHost.UseKestrel(options => options.ListenAnyIP(5000));
 
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
