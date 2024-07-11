@@ -173,6 +173,14 @@ namespace BlogAPI2.Endpoints
             })
             .RequireAuthorization();
 
+            app.MapGet("tags", async (ApplicationDbContext context, CancellationToken ct) =>
+            {
+                var tags = await context.Tag.OrderBy(t => t.Name).ToListAsync(ct);
+                var response = tags.Select(t => t.Name).ToArray();
+
+                return Results.Ok(response);
+            });
+
             app.MapGet("blogsByTag", async (string[] tags, ApplicationDbContext context, CancellationToken ct, int page = 1, int pageSize = 10) =>
             {
                 var blogs = await context.Blogs
