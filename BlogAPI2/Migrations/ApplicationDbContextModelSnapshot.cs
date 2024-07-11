@@ -50,6 +50,21 @@ namespace BlogAPI2.Migrations
                     b.ToTable("Blogs");
                 });
 
+            modelBuilder.Entity("BlogAPI2.Entities.BlogTag", b =>
+                {
+                    b.Property<Guid>("BlogId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TagId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("BlogId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("BlogTag");
+                });
+
             modelBuilder.Entity("BlogAPI2.Entities.ExceptionInfo", b =>
                 {
                     b.Property<Guid>("Id")
@@ -70,6 +85,21 @@ namespace BlogAPI2.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ExceptionInfo");
+                });
+
+            modelBuilder.Entity("BlogAPI2.Entities.Tag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tag");
                 });
 
             modelBuilder.Entity("BlogAPI2.Entities.User", b =>
@@ -301,6 +331,25 @@ namespace BlogAPI2.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("BlogAPI2.Entities.BlogTag", b =>
+                {
+                    b.HasOne("BlogAPI2.Entities.Blog", "Blog")
+                        .WithMany("BlogTags")
+                        .HasForeignKey("BlogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BlogAPI2.Entities.Tag", "Tag")
+                        .WithMany("BlogTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Blog");
+
+                    b.Navigation("Tag");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -350,6 +399,16 @@ namespace BlogAPI2.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BlogAPI2.Entities.Blog", b =>
+                {
+                    b.Navigation("BlogTags");
+                });
+
+            modelBuilder.Entity("BlogAPI2.Entities.Tag", b =>
+                {
+                    b.Navigation("BlogTags");
                 });
 #pragma warning restore 612, 618
         }

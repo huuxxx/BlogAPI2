@@ -72,7 +72,8 @@ namespace BlogAPI2.Endpoints
                     return Results.BadRequest("Failed to create user");
 
                 return Results.Ok();
-            }).RequireAuthorization();
+            })
+            .RequireAuthorization();
         }
     }
 }

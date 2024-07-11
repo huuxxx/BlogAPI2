@@ -9,4 +9,6 @@ public class CreateBlogRequest
 
     [Required]
     public string Content { get; set; }
+
+    public string[] Tags { get; set; }
 }

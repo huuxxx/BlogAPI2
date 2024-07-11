@@ -11,12 +11,27 @@ public sealed class ApplicationDbContext : IdentityDbContext<User>
     {
     }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(builder);
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<BlogTag>()
+            .HasKey(bt => new { bt.BlogId, bt.TagId });
+
+        modelBuilder.Entity<BlogTag>()
+            .HasOne(bt => bt.Blog)
+            .WithMany(b => b.BlogTags)
+            .HasForeignKey(bt => bt.BlogId);
+
+        modelBuilder.Entity<BlogTag>()
+            .HasOne(bt => bt.Tag)
+            .WithMany(t => t.BlogTags)
+            .HasForeignKey(bt => bt.TagId);
     }
 
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Visitor> Visitors { get; set; }
     public DbSet<ExceptionInfo> ExceptionInfo { get; set; }
+    public DbSet<Tag> Tag { get; set; }
+    public DbSet<BlogTag> BlogTag { get; set; }
 }

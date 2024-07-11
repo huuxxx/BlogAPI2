@@ -18,7 +18,8 @@ namespace BlogAPI2.Endpoints
                 }
 
                 return $"{configurationHelper.GetApiUrl}/{configurationHelper.GetImagesDirectory}/{timeStamp + Path.GetExtension(file.FileName)}";
-            }).DisableAntiforgery().RequireAuthorization();
+            })
+            .DisableAntiforgery().RequireAuthorization();
 
             app.MapDelete("images/{id}", (string id, ConfigurationHelper configurationHelper) =>
             {
@@ -41,7 +42,8 @@ namespace BlogAPI2.Endpoints
                 }
 
                 return Results.Ok(images);
-            }).RequireAuthorization();
+            })
+            .RequireAuthorization();
         }
     }
 }

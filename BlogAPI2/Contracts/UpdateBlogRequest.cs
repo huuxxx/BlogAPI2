@@ -12,4 +12,6 @@ public class UpdateBlogRequest
 
     [Required]
     public string Content { get; set; }
+
+    public string[] Tags { get; set; }
 }

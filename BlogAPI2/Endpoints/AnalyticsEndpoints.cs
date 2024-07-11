@@ -26,7 +26,6 @@ namespace BlogAPI2.Endpoints
                 };
 
                 context.Add(visitor);
-
                 await context.SaveChangesAsync(ct);
 
                 return Results.Ok(visitor);

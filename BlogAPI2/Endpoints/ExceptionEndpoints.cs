@@ -12,7 +12,8 @@ namespace BlogAPI2.Endpoints
                 var exceptions = await context.ExceptionInfo.OrderBy(x => x.DateCreated).ToListAsync(ct);
 
                 return Results.Ok(exceptions);
-            }).RequireAuthorization();
+            })
+            .RequireAuthorization();
 
             app.MapDelete("exceptions", async (ApplicationDbContext context, CancellationToken ct) =>
             {
@@ -24,11 +25,11 @@ namespace BlogAPI2.Endpoints
                 }
 
                 context.RemoveRange(exceptions);
-
                 await context.SaveChangesAsync(ct);
 
                 return Results.NoContent();
-            }).RequireAuthorization();
+            })
+            .RequireAuthorization();
 
         }
     }
