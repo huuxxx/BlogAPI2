@@ -197,11 +197,11 @@ namespace BlogAPI2.Endpoints
                 return Results.Ok(response);
             });
 
-            app.MapDelete("tags/{id}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
+            app.MapDelete("tags/{name}", async (string name, ApplicationDbContext context, CancellationToken ct) =>
             {
                 var tag = await context.Tag
                     .Include(t => t.BlogTags)
-                    .FirstOrDefaultAsync(t => t.Id == id, ct);
+                    .FirstOrDefaultAsync(t => t.Name == name, ct);
 
                 if (tag is null)
                 {
