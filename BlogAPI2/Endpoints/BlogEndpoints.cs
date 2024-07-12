@@ -199,23 +199,20 @@ namespace BlogAPI2.Endpoints
 
             app.MapDelete("tags/{id}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
             {
-                using (context)
+                var tag = await context.Tag
+                    .Include(t => t.BlogTags)
+                    .FirstOrDefaultAsync(t => t.Id == id, ct);
+
+                if (tag is null)
                 {
-                    var tag = await context.Tag
-                        .Include(t => t.BlogTags)
-                        .FirstOrDefaultAsync(t => t.Id == id, ct);
-
-                    if (tag is null)
-                    {
-                        return Results.BadRequest();
-                    }
-
-                    context.BlogTag.RemoveRange(tag.BlogTags);
-                    context.Tag.Remove(tag);
-                    await context.SaveChangesAsync(ct);
-
-                    return Results.Ok();
+                    return Results.BadRequest();
                 }
+
+                context.BlogTag.RemoveRange(tag.BlogTags);
+                context.Tag.Remove(tag);
+                await context.SaveChangesAsync(ct);
+
+                return Results.Ok();
             })
             .RequireAuthorization();
         }
