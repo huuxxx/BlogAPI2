@@ -23,6 +23,8 @@ namespace BlogAPI2.Endpoints
 
                 foreach (var tagName in request.Tags)
                 {
+                    if (string.IsNullOrEmpty(tagName)) continue;
+
                     var tag = await context.Tag.FirstOrDefaultAsync(t => t.Name == tagName);
 
                     if (tag is null)
@@ -53,7 +55,7 @@ namespace BlogAPI2.Endpoints
 
                 var response = MappingHelper.BlogEntityToDto(blogs);
 
-                return Results.Ok(blogs);
+                return Results.Ok(response);
             });
 
             app.MapGet("blogs/{id}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
@@ -153,6 +155,11 @@ namespace BlogAPI2.Endpoints
 
             app.MapPost("tags/{name}", async (string name, ApplicationDbContext context, CancellationToken ct) =>
             {
+                if (string.IsNullOrEmpty(name))
+                {
+                    return Results.BadRequest();
+                }
+
                 var tagCheck = await context.Tag.FirstOrDefaultAsync(x => x.Name == name, ct);
 
                 if (tagCheck is not null)

@@ -67,7 +67,7 @@ namespace BlogAPI2.Endpoints
                 };
 
                 var result = await userManager.CreateAsync(user, request.Password);
-                
+
                 if (!result.Succeeded)
                     return Results.BadRequest("Failed to create user");
 

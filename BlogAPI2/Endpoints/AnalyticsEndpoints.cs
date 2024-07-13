@@ -28,7 +28,7 @@ namespace BlogAPI2.Endpoints
                 context.Add(visitor);
                 await context.SaveChangesAsync(ct);
 
-                return Results.Ok(visitor);
+                return Results.Ok(visitor.Id);
             });
 
             app.MapPut("visitors", async (UpdateVisitorRequest request, ApplicationDbContext context, CancellationToken ct) =>
@@ -76,7 +76,7 @@ namespace BlogAPI2.Endpoints
             {
                 var visitors = await context.Visitors
                     .AsNoTracking()
-                    .OrderByDescending(x => x.DateVisited)
+                    .OrderBy(x => x.DateVisited)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync(ct);
