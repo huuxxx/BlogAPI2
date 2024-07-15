@@ -1,31 +1,43 @@
-using Microsoft.EntityFrameworkCore;
 using BlogAPI2.Database;
-using BlogAPI2.Extensions;
 using BlogAPI2.Endpoints;
-using Microsoft.AspNetCore.Rewrite;
-using BlogAPI2.Helpers;
 using BlogAPI2.Entities;
-using Microsoft.AspNetCore.Identity;
-using BlogAPI2.Middleware;
-using Microsoft.OpenApi.Models;
+using BlogAPI2.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Rewrite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("LocalPolicy", builder =>
+    {
+        builder.WithOrigins("https://localhost:5003", "http://localhost:3000/")
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+
+    options.AddPolicy("ProductionPolicy", builder =>
+    {
+        builder.WithOrigins("https://www.your-remote-api-consumer.com", "https://your-remote-api-consumer2")
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ConfigurationHelper>();
 builder.Services.AddSingleton<RequestHelper>();
-builder.Services.AddCors();
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options => options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-
 builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-
 builder.Services.AddAuthorization();
 
 var jwtSettings = builder.Configuration.GetSection("JWT");
@@ -37,20 +49,19 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
+{
+    options.SaveToken = true;
+    options.RequireHttpsMetadata = false;
+    options.TokenValidationParameters = new TokenValidationParameters()
     {
-        options.SaveToken = true;
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret!))
-        };
-    });
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret!))
+    };
+});
 
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
-
 builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<RoleManager<IdentityRole>>();
 
@@ -89,23 +100,28 @@ builder.Services.AddSwaggerGen(swagger =>
 });
 
 var app = builder.Build();
-app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
-    app.ApplyMigrations();
+    app.UseCors("LocalPolicy");
+}
+else
+{
+    app.UseCors("ProductionPolicy");
+}
+
+if (app.Environment.IsDevelopment())
+{
     app.UseSwagger();
     app.UseSwaggerUI();
-
-    var option = new RewriteOptions();
-    option.AddRedirect("^$", "swagger");
-    app.UseRewriter(option);
+    app.UseRewriter(new RewriteOptions().AddRedirect("^$", "swagger"));
 }
-else builder.WebHost.UseKestrel(options => options.ListenAnyIP(5000));
-
-app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
+else
+{
+    app.UseHttpsRedirection();
+    app.UseAuthentication();
+    app.UseAuthorization();
+}
 
 app.MapBlogEndpoints();
 app.MapImageEndpoints();
