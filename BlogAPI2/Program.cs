@@ -17,7 +17,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("LocalPolicy", builder =>
     {
-        builder.WithOrigins("https://localhost:5003", "http://localhost:3000/")
+        builder.WithOrigins("https://localhost:5003", "https://localhost:3000")
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
@@ -104,24 +104,18 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseCors("LocalPolicy");
-}
-else
-{
-    app.UseCors("ProductionPolicy");
-}
-
-if (app.Environment.IsDevelopment())
-{
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseRewriter(new RewriteOptions().AddRedirect("^$", "swagger"));
 }
 else
 {
-    app.UseHttpsRedirection();
-    app.UseAuthentication();
-    app.UseAuthorization();
+    app.UseCors("ProductionPolicy");
 }
+
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapBlogEndpoints();
 app.MapImageEndpoints();
