@@ -96,46 +96,45 @@ namespace BlogAPI2.Endpoints
                     return Results.BadRequest();
                 }
 
-                using (context)
+                blog.Title = request.Title;
+                blog.Content = request.Content;
+                blog.DateModified = DateTime.UtcNow;
+
+                var existingTags = blog.BlogTags.Select(bt => bt.Tag.Name).ToList();
+
+                var tagsToAdd = request.Tags.Except(existingTags).ToList();
+                var tagsToRemove = existingTags.Except(request.Tags).ToList();
+
+                foreach (var tagName in tagsToAdd)
                 {
-                    blog.Title = request.Title;
-                    blog.Content = request.Content;
-                    blog.DateModified = DateTime.UtcNow;
+                    var tag = await context.Tag.FirstOrDefaultAsync(t => t.Name == tagName);
 
-                    var existingTags = blog.BlogTags.Select(bt => bt.Tag.Name).ToList();
-
-                    var tagsToAdd = request.Tags.Except(existingTags).ToList();
-                    var tagsToRemove = existingTags.Except(request.Tags).ToList();
-
-                    foreach (var tagName in tagsToAdd)
+                    if (tag is null)
                     {
-                        var tag = await context.Tag.FirstOrDefaultAsync(t => t.Name == tagName);
-
-                        if (tag is null)
-                        {
-                            tag = new Tag { Name = tagName };
-                            context.Tag.Add(tag);
-                        }
-
-                        blog.BlogTags.Add(new BlogTag { Blog = blog, Tag = tag });
+                        tag = new Tag { Name = tagName };
+                        context.Tag.Add(tag);
                     }
 
-                    foreach (var tagName in tagsToRemove)
-                    {
-                        var blogTag = blog.BlogTags.FirstOrDefault(bt => bt.Tag.Name == tagName);
-
-                        if (blogTag is not null)
-                        {
-                            context.BlogTag.Remove(blogTag);
-                        }
-                    }
-
-                    await context.SaveChangesAsync(ct);
-
-                    return Results.Ok();
+                    blog.BlogTags.Add(new BlogTag { Blog = blog, Tag = tag });
                 }
+
+                foreach (var tagName in tagsToRemove)
+                {
+                    var blogTag = blog.BlogTags.FirstOrDefault(bt => bt.Tag.Name == tagName);
+
+                    if (blogTag is not null)
+                    {
+                        blog.BlogTags.Remove(blogTag);
+                        context.BlogTag.Remove(blogTag);
+                    }
+                }
+
+                await context.SaveChangesAsync(ct);
+
+                return Results.Ok();
             })
             .RequireAuthorization();
+
 
             app.MapDelete("blogs/{id}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
             {
