@@ -70,7 +70,8 @@ namespace BlogAPI2.Endpoints
                 var totalVisits = context.Visitors.Count();
 
                 return Results.Ok(totalVisits);
-            });
+            })
+            .RequireAuthorization();
 
             app.MapGet("visitors", async (ApplicationDbContext context, CancellationToken ct, int page = 1, int pageSize = 10) =>
             {
@@ -82,7 +83,8 @@ namespace BlogAPI2.Endpoints
                     .ToListAsync(ct);
 
                 return Results.Ok(visitors);
-            });
+            })
+            .RequireAuthorization();
 
             app.MapGet("visitorsPastWeek", (ApplicationDbContext context) =>
             {
@@ -111,7 +113,8 @@ namespace BlogAPI2.Endpoints
                     .ToList();
 
                 return Results.Ok(result);
-            });
+            })
+            .RequireAuthorization();
         }
     }
 }
