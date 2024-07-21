@@ -10,14 +10,18 @@ namespace BlogAPI2.Endpoints
             app.MapPost("images", async ([FromForm] IFormFile file, CancellationToken ct, ConfigurationHelper configurationHelper) =>
             {
                 string timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssffff");
-                string path = Path.Combine(Directory.GetCurrentDirectory(), @$"{configurationHelper.GetImagesDirectory}\" + timeStamp + Path.GetExtension(file.FileName));
-
+                string fileExtension = Path.GetExtension(file.FileName);
+                string ImagesDirectory = configurationHelper.GetImagesDirectory();
+                
+                string path = Path.Combine(Directory.GetCurrentDirectory(), @$"{ImagesDirectory}/" + timeStamp + fileExtension);
                 using (var stream = new FileStream(path, FileMode.Create))
                 {
                     await file.CopyToAsync(stream, ct);
                 }
 
-                return $"{configurationHelper.GetApiUrl}/{configurationHelper.GetImagesDirectory}/{timeStamp + Path.GetExtension(file.FileName)}";
+                string apiUrl = configurationHelper.GetApiUrl();
+                string outputUrl = $"{apiUrl}/{ImagesDirectory}/{timeStamp + fileExtension}";
+                return Results.Ok(outputUrl);
             })
             .DisableAntiforgery().RequireAuthorization();
 
@@ -25,7 +29,7 @@ namespace BlogAPI2.Endpoints
             {
                 string path = Path.Combine(Directory.GetCurrentDirectory(), $@"{configurationHelper.GetImagesDirectory}\" + id);
                 File.Delete(path);
-                return Results.NoContent();
+                return Results.Ok();
             });
 
             app.MapGet("images", (ConfigurationHelper configurationHelper) =>
