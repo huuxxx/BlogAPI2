@@ -27,14 +27,15 @@ namespace BlogAPI2.Endpoints
 
             app.MapDelete("images/{id}", (string id, ConfigurationHelper configurationHelper) =>
             {
-                string path = Path.Combine(Directory.GetCurrentDirectory(), $@"{configurationHelper.GetImagesDirectory}\" + id);
+                string path = Path.Combine(Directory.GetCurrentDirectory(), $@"{configurationHelper.GetImagesDirectory()}/" + id);
                 File.Delete(path);
                 return Results.Ok();
-            });
+            })
+            .RequireAuthorization();
 
             app.MapGet("images", (ConfigurationHelper configurationHelper) =>
             {
-                string path = Path.Combine(Directory.GetCurrentDirectory(), $"{configurationHelper.GetImagesDirectory}");
+                string path = Path.Combine(Directory.GetCurrentDirectory(), $"{configurationHelper.GetImagesDirectory()}");
                 string[] images = Directory.GetFiles(path);
 
                 if (images.Length > 0)
