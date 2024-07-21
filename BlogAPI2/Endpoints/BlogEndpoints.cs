@@ -46,7 +46,7 @@ namespace BlogAPI2.Endpoints
             app.MapGet("blogs", async (ApplicationDbContext context, CancellationToken ct, int page = 1, int pageSize = 10) =>
             {
                 var blogs = await context.Blogs
-                    .OrderBy(b => b.DateCreated)
+                    .OrderByDescending(b => b.DateCreated)
                     .Include(b => b.BlogTags)
                     .ThenInclude(bt => bt.Tag)
                     .Skip((page - 1) * pageSize)
