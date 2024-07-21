@@ -58,7 +58,7 @@ namespace BlogAPI2.Endpoints
                 return Results.Ok(response);
             });
 
-            app.MapGet("blogs/{id}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
+            app.MapGet("blogs/{id}", async (Guid id, ApplicationDbContext context, CancellationToken ct, bool? increment = true) =>
             {
                 var blog = await context.Blogs
                     .Include(b => b.BlogTags)
@@ -70,11 +70,14 @@ namespace BlogAPI2.Endpoints
                     return Results.NotFound();
                 }
 
-                var increment = blog.ViewCount + 1;
-                blog.ViewCount = increment;
-                await context.SaveChangesAsync(ct);
+                if (increment is true)
+                {
+                    var incrementValue = blog.ViewCount + 1;
+                    blog.ViewCount = incrementValue;
+                    await context.SaveChangesAsync(ct);
+                    
+                }
                 var response = MappingHelper.BlogEntityToDto(blog);
-
                 return Results.Ok(response);
             });
 
@@ -148,7 +151,7 @@ namespace BlogAPI2.Endpoints
                 context.Remove(blog);
                 await context.SaveChangesAsync(ct);
 
-                return Results.NoContent();
+                return Results.Ok();
             })
             .RequireAuthorization();
 
