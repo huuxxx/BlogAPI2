@@ -11,27 +11,27 @@
 
         public string GetApiUrl()
         {
-            return _configuration["MySettings:ApiUrl"] ?? throw new NullReferenceException();
+            return _configuration["MySettings:ApiUrl"] ?? "";
         }
 
         public string GetImagesDirectory()
         {
-            return _configuration["MySettings:ImagesDirectory"] ?? throw new NullReferenceException();
+            return _configuration["MySettings:ImagesDirectory"] ?? "";
         }
 
         public string GetJwtSecret()
         {
-            return _configuration["JWT:Secret"] ?? throw new NullReferenceException();
+            return _configuration["JWT:Secret"] ?? "";
         }
 
         public string GetJwtAudience()
         {
-            return _configuration["JWT:ValidAudience"] ?? throw new NullReferenceException();
+            return _configuration["JWT:ValidAudience"] ?? "";
         }
 
         public string GetJwtIssuer()
         {
-            return _configuration["JWT:ValidIssuer"] ?? throw new NullReferenceException();
+            return _configuration["JWT:ValidIssuer"] ?? "";
         }
     }
 }
