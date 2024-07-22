@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
 
     options.AddPolicy("ProductionPolicy", builder =>
     {
-        builder.WithOrigins("https://www.hux-dev.com", "https://huxdevblogcms.netlify.app")
+        builder.WithOrigins("https://www.your-remote-api-consumer.com", "https://your-remote-api-consumer2")
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
@@ -111,7 +111,6 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseCors("ProductionPolicy");
-    app.UseRewriter(new RewriteOptions().AddRedirect("^$", "https://www.hux-dev.com"));
 }
 
 app.UseHttpsRedirection();
