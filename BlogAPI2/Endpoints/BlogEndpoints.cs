@@ -3,6 +3,7 @@ using BlogAPI2.Contracts;
 using BlogAPI2.Database;
 using BlogAPI2.Entities;
 using BlogAPI2.Helpers;
+using BlogAPI2.DTO;
 
 namespace BlogAPI2.Endpoints
 {
@@ -43,17 +44,23 @@ namespace BlogAPI2.Endpoints
             })
             .RequireAuthorization();
 
-            app.MapGet("blogs", async (ApplicationDbContext context, CancellationToken ct, int page = 1, int pageSize = 10) =>
+            app.MapGet("blogs", async (ApplicationDbContext context, CancellationToken ct, int page = 0, int pageSize = 10) =>
             {
                 var blogs = await context.Blogs
                     .OrderByDescending(b => b.DateCreated)
                     .Include(b => b.BlogTags)
                     .ThenInclude(bt => bt.Tag)
-                    .Skip((page - 1) * pageSize)
+                    .Skip(page * pageSize)
                     .Take(pageSize)
                     .ToListAsync(ct);
 
-                var response = MappingHelper.BlogEntityToDto(blogs);
+                var count = await context.Blogs.CountAsync(ct);
+
+                var response = new PaginatedBlogResponse
+                {
+                    Count = count,
+                    Blogs = MappingHelper.BlogEntityToDto(blogs),
+                };
 
                 return Results.Ok(response);
             });
