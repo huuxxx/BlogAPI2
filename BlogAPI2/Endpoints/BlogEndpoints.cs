@@ -32,9 +32,8 @@ namespace BlogAPI2.Endpoints
                     {
                         tag = new Tag { Name = tagName };
                         context.Tag.Add(tag);
+                        blog.BlogTags.Add(new BlogTag { Blog = blog, Tag = tag });
                     }
-
-                    blog.BlogTags.Add(new BlogTag { Blog = blog, Tag = tag });
                 }
 
                 context.Add(blog);
