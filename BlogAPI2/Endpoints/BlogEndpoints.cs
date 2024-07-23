@@ -4,6 +4,7 @@ using BlogAPI2.Database;
 using BlogAPI2.Entities;
 using BlogAPI2.Helpers;
 using BlogAPI2.DTO;
+using System.Text.Json;
 
 namespace BlogAPI2.Endpoints
 {
@@ -32,8 +33,9 @@ namespace BlogAPI2.Endpoints
                     {
                         tag = new Tag { Name = tagName };
                         context.Tag.Add(tag);
-                        blog.BlogTags.Add(new BlogTag { Blog = blog, Tag = tag });
                     }
+
+                    blog.BlogTags.Add(new BlogTag { Blog = blog, Tag = tag });
                 }
 
                 context.Add(blog);
@@ -161,9 +163,13 @@ namespace BlogAPI2.Endpoints
             })
             .RequireAuthorization();
 
-            app.MapPost("tags/{name}", async (string name, ApplicationDbContext context, CancellationToken ct) =>
+            app.MapPost("tags", async (HttpContext httpContext, ApplicationDbContext context, CancellationToken ct) =>
             {
-                if (string.IsNullOrEmpty(name))
+                using var reader = new StreamReader(httpContext.Request.Body);
+                var body = await reader.ReadToEndAsync();
+                var data = JsonSerializer.Deserialize<Dictionary<string, string>>(body);
+
+                if (data == null || !data.TryGetValue("name", out var name) || string.IsNullOrEmpty(name))
                 {
                     return Results.BadRequest();
                 }
@@ -230,6 +236,40 @@ namespace BlogAPI2.Endpoints
                 return Results.Ok();
             })
             .RequireAuthorization();
+
+            app.MapDelete("tags", async (HttpContext httpContext, ApplicationDbContext context, CancellationToken ct) =>
+            {
+                using var reader = new StreamReader(httpContext.Request.Body);
+                var body = await reader.ReadToEndAsync();
+                var tagNames = JsonSerializer.Deserialize<string[]>(body);
+
+                if (tagNames is null)
+                {
+                    return Results.BadRequest();
+                }
+
+                var tags = await context.Tag
+                    .Include(t => t.BlogTags)
+                    .Where(t => tagNames.Contains(t.Name))
+                    .ToListAsync(ct);
+
+                if (tags.Count != tagNames.Length)
+                {
+                    return Results.BadRequest();
+                }
+
+                foreach (var tag in tags)
+                {
+                    context.BlogTag.RemoveRange(tag.BlogTags);
+                    context.Tag.Remove(tag);
+                }
+
+                await context.SaveChangesAsync(ct);
+
+                return Results.Ok();
+            })
+            .RequireAuthorization();
+
         }
     }
 }
