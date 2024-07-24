@@ -15,7 +15,7 @@ namespace BlogAPI2.Helpers
                 DateCreated = blog.DateCreated,
                 DateModified = blog.DateModified,
                 ViewCount = blog.ViewCount,
-                Tags = blog.BlogTags.Select(bt => bt.Tag.Name).ToList()
+                Tags = blog.BlogTags.OrderBy(x => x.Tag.Name).Select(bt => bt.Tag.Name).ToList()
             };
         }
 
