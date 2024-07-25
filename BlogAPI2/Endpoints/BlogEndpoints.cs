@@ -202,18 +202,16 @@ namespace BlogAPI2.Endpoints
                 return Results.Ok(response);
             });
 
-            app.MapGet("blogsByTag", async (string[] tags, ApplicationDbContext context, CancellationToken ct, int page = 1, int pageSize = 10) =>
+            app.MapPost("blogsByTags", async (TagFilterRequest request, ApplicationDbContext context, CancellationToken ct, int page = 1, int pageSize = 10) =>
             {
                 var blogs = await context.Blogs
-                    .Where(b => b.BlogTags.Any(bt => tags.Contains(bt.Tag.Name)))
+                    .Where(b => request.TagFilters.All(tag => b.BlogTags.Any(bt => bt.Tag.Name == tag)))
                     .OrderBy(b => b.DateCreated)
                     .Include(b => b.BlogTags)
                     .ThenInclude(bt => bt.Tag)
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
                     .ToListAsync(ct);
 
-                var response = MappingHelper.BlogEntityToDto(blogs);
+                var response = MappingHelper.BlogEntityToPreview(blogs);
 
                 return Results.Ok(response);
             });

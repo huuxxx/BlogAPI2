@@ -23,5 +23,21 @@ namespace BlogAPI2.Helpers
         {
             return blogs.Select(blog => BlogEntityToDto(blog)).ToList();
         }
+
+        public static BlogPreviewResponse BlogEntityToPreview(Blog blog)
+        {
+            return new BlogPreviewResponse
+            {
+                Id = blog.Id,
+                Title = blog.Title,
+                DateCreated = blog.DateCreated,
+                ViewCount = blog.ViewCount,
+            };
+        }
+
+        public static List<BlogPreviewResponse> BlogEntityToPreview(List<Blog> blogs)
+        {
+            return blogs.Select(blog => BlogEntityToPreview(blog)).ToList();
+        }
     }
 }
