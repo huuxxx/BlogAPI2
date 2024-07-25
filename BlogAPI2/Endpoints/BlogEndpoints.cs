@@ -218,6 +218,19 @@ namespace BlogAPI2.Endpoints
                 return Results.Ok(response);
             });
 
+            app.MapPost("blogsByTagIds", async (TagFilterRequest request, ApplicationDbContext context, CancellationToken ct) =>
+            {
+                var blogIds = await context.Blogs
+                    .Where(b => request.TagFilters.All(tag => b.BlogTags.Any(bt => bt.Tag.Name == tag)))
+                    .OrderBy(b => b.DateCreated)
+                    .Include(b => b.BlogTags)
+                    .ThenInclude(bt => bt.Tag)
+                    .Select(x => x.Id)
+                    .ToListAsync(ct);
+
+                return blogIds is null ? Results.NotFound() : Results.Ok(blogIds);
+            });
+
             app.MapDelete("tags/{name}", async (string name, ApplicationDbContext context, CancellationToken ct) =>
             {
                 var tag = await context.Tag
