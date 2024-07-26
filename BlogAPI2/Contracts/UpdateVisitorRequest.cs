@@ -12,5 +12,7 @@ namespace BlogAPI2.Contracts
         public bool ViewedProjects { get; set; }
 
         public bool ViewedAbout { get; set; }
+
+        public bool ViewedSearch { get; set; }
     }
 }

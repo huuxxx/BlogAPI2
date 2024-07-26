@@ -65,6 +65,12 @@ namespace BlogAPI2.Endpoints
                     context.Entry(visitor).Property(x => x.ViewedAbout).IsModified = true;
                 }
 
+                if (request.ViewedSearch)
+                {
+                    visitor.ViewedSearch = true;
+                    context.Entry(visitor).Property(x => x.ViewedSearch).IsModified = true;
+                }
+
                 await context.SaveChangesAsync(ct);
 
                 return Results.Ok();

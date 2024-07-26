@@ -10,5 +10,7 @@
         public bool ViewedBlogs { get; set; }
         public bool ViewedProjects { get; set; }
         public bool ViewedAbout { get; set; }
+
+        public bool ViewedSearch { get; set; }
     }
 }
