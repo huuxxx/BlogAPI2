@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using System.Text;
+using BlogAPI2.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,6 +104,7 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.ApplyMigrations();
     app.UseCors("LocalPolicy");
     app.UseSwagger();
     app.UseSwaggerUI();
