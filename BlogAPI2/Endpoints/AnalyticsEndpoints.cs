@@ -12,9 +12,9 @@ namespace BlogAPI2.Endpoints
     {
         public static void MapAnalyticsEndpoints(this IEndpointRouteBuilder app)
         {
-            app.MapPost("visitors", async (Visitor request, ApplicationDbContext context, CancellationToken ct, RequestHelper requestHelper) =>
+            app.MapPost("visitors", async (Visitor request, HttpContext httpContext, ApplicationDbContext context, CancellationToken ct, RequestHelper requestHelper) =>
             {
-                var ipAddress = requestHelper.GetIpAddress();
+                var ipAddress = httpContext.Connection.RemoteIpAddress!.ToString();
 
                 var visitor = new Visitor
                 {
