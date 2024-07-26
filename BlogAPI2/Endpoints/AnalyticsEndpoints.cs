@@ -14,7 +14,12 @@ namespace BlogAPI2.Endpoints
         {
             app.MapPost("visitors", async (Visitor request, HttpContext httpContext, ApplicationDbContext context, CancellationToken ct, RequestHelper requestHelper) =>
             {
-                var ipAddress = httpContext.Connection.RemoteIpAddress!.ToString();
+                var ipAddress = requestHelper.GetIpAddress();
+
+                if (httpContext.Request.Headers.TryGetValue("X-Forwarded-For", out var forwardedFor))
+                {
+                    ipAddress = forwardedFor.ToString();
+                }
 
                 var visitor = new Visitor
                 {
