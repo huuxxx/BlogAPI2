@@ -88,7 +88,7 @@ namespace BlogAPI2.Endpoints
             {
                 var visitors = await context.Visitors
                     .AsNoTracking()
-                    .OrderBy(x => x.DateVisited)
+                    .OrderByDescending(x => x.DateVisited)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync(ct);
