@@ -12,7 +12,7 @@ namespace BlogAPI2.Endpoints
                 string timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssffff");
                 string fileExtension = Path.GetExtension(file.FileName);
                 string ImagesDirectory = configurationHelper.GetImagesDirectory();
-                
+
                 string path = Path.Combine(Directory.GetCurrentDirectory(), @$"{ImagesDirectory}/" + timeStamp + fileExtension);
                 using (var stream = new FileStream(path, FileMode.Create))
                 {
@@ -23,7 +23,10 @@ namespace BlogAPI2.Endpoints
                 string outputUrl = $"{apiUrl}/{ImagesDirectory}/{timeStamp + fileExtension}";
                 return Results.Ok(outputUrl);
             })
-            .DisableAntiforgery().RequireAuthorization();
+            .DisableAntiforgery()
+            .RequireAuthorization()
+            .WithMetadata(new RequestSizeLimitAttribute(10_000_000))
+            .WithMetadata(new RequestFormLimitsAttribute { MultipartBodyLengthLimit = 10_000_000 });
 
             app.MapDelete("images/{id}", (string id, ConfigurationHelper configurationHelper) =>
             {
