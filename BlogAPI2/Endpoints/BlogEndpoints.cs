@@ -89,9 +89,16 @@ namespace BlogAPI2.Endpoints
                 return Results.Ok(response);
             });
 
-            app.MapGet("blogIds", async (ApplicationDbContext context, CancellationToken ct) =>
+            app.MapGet("blogIds", async (ApplicationDbContext context, CancellationToken ct, string excludeTagFromResults = "") =>
             {
-                var blogIds = await context.Blogs.OrderBy(x => x.DateCreated).Select(x => x.Id).ToListAsync(ct);
+                var query = context.Blogs.AsQueryable();
+
+                if (!string.IsNullOrEmpty(excludeTagFromResults))
+                {
+                    query = query.Where(b => !b.BlogTags.Any(bt => bt.Tag.Name == excludeTagFromResults));
+                }
+
+                var blogIds = await query.OrderBy(x => x.DateCreated).Select(x => x.Id).ToListAsync(ct);
                 return blogIds is null ? Results.NotFound() : Results.Ok(blogIds);
             });
 
